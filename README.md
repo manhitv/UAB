@@ -17,7 +17,6 @@
 🔧 [**Usage**](#usage) **|**
 🧪 [**Reproducing Results**](#reproduce) **|**
 🎯 [**Benchmarks**](#bench) **|**
-🧠 [**Baselines**](#baselines) **|**
 📂 [**Project Structure**](#structure)
 
 </div>
@@ -42,24 +41,18 @@ UAB needs **no auxiliary model and no extra LLM call**, and works on both open-w
 models (ANLL from log-probs) and black-box APIs (verbalized confidence).
 
 📜 For method details and full results, see the paper:
-**Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning**.
+**Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning** (coming soon...).
 
 ---
 
 ## <a name="install"></a> 🚀 Installation
 
-#### ⏬ Clone
+#### ⏬ Environment Setup
 
 ```bash
-git clone <repository-url> UAB
+git clone https://github.com/manhitv/UAB.git
 cd UAB
-```
 
-#### 💿 Dependencies
-
-Python 3.10 or higher is recommended.
-
-```bash
 conda create -n uab python=3.11 -y
 conda activate uab
 pip install -r requirements.txt
@@ -111,9 +104,6 @@ Run a short end-to-end check of the full pipeline:
 bash scripts/validate.sh
 ```
 
-> ✍️ Due to vLLM sampling non-determinism, results vary slightly across runs. The paper
-> reports means ± std over three seeds.
-
 #### 📒 Outputs
 
 After each run:
@@ -140,104 +130,6 @@ averaged over **seeds `42 44 46`**.
 | `scripts/run_blackbox.sh`    | Black-box & big-model table (GPT-OSS-20B, Gemma3-27B, Cohere) |
 | `scripts/run_ablations.sh`   | Temperature, uncertainty metric, threshold exits, Phase-1 vote, VCS, wall-clock |
 | `scripts/validate.sh`        | Quick end-to-end smoke test |
-
-#### 1. Main results (Table 1)
-
-For every model–benchmark pair, run the four baselines and UAB at `N=4`:
-
-```bash
-# UAB (Ours)
-python src/main.py --model qwen2.5-1.5b --data formal_logic --data_size 0 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 --score_fn exp --seed 42
-
-# Baselines
-for M in vote random length llm_judge; do
-  python src/main.py --model qwen2.5-1.5b --data formal_logic --data_size 0 \
-    --budget_mode $M --num_agents 4 --seed 42
-done
-```
-
-Full sweep: `bash scripts/run_main_table.sh`
-
-#### 2. Scaling with budget (Figure: scaling behaviour)
-
-Sweep the per-question budget `N` for UAB and the Uniform baseline:
-
-```bash
-for N in 2 4 8; do
-  python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-    --budget_mode uav_base --num_agents $N --tau 0.2 --seed 42
-  python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-    --budget_mode vote --num_agents $N --seed 42
-done
-```
-
-#### 3. Cost at fixed accuracy (Figure: cost-at-accuracy)
-
-Fine-grained budget grid for Qwen2.5-1.5B / Llama3.2-3B:
-
-```bash
-for N in 1 2 4 6 8 12 16; do
-  python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-    --budget_mode uav_base --num_agents $N --tau 0.2 --seed 42
-done
-```
-
-#### 4. Black-box & big-model setting
-
-Open-weight large models reuse the main commands with `--model gptoss` /
-`--model gemma3-27b`. The black-box Cohere API uses `--backend cohere`:
-
-```bash
-export COHERE_API_KEY="your_cohere_api_key_here"
-for M in vote llm_judge uav; do
-  python src/main.py --backend cohere --model command-a-03-2025 \
-    --data hh_rlhf --data_size 300 --budget_mode $M --num_agents 4 --tau 0.2 --seed 42
-done
-```
-
-Full sweep: `bash scripts/run_blackbox.sh`
-
-#### 5. Ablations
-
-```bash
-# Temperature tau
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.5 --seed 42
-
-# Uncertainty / difficulty metric
-python src/main.py --model qwen2.5-1.5b --data formal_logic --data_size 0 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 --diff_metric token_var --seed 42
-
-# Hard-threshold exit (skip questions too hard even at full budget)
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 \
-  --hard_mode skip --theta_hard 0.5 --n_max 8 --seed 42
-
-# Easy-threshold exit (skip easy questions, save budget)
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 \
-  --easy_mode skip --theta_easy 0.7 --seed 42
-
-# Phase-1 vote contribution ablation
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 --no_phase1_vote --seed 42
-
-# Verbalized confidence (VCS) instead of ANLL
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 --uncertainty_mode vcs --seed 42
-
-# Static threshold-exit analysis tables (no model needed)
-python src/main.py --analyze --tau 0.2
-```
-
-Full sweep: `bash scripts/run_ablations.sh`
-
-> ✍️ **Wall-clock & token analysis.** Every run records per-response token counts and
-> per-phase wall-clock time inside `out/history/<experiment_name>.jsonl`
-> (`token_stats`, `time_taken`). The **budget-allocation analysis** (allocation vs.
-> difficulty) is also derived from this file: each question's `len(responses)` is its
-> allocated budget and `uncertainty` is its ANLL.
 
 ---
 
@@ -267,34 +159,6 @@ Full sweep: `bash scripts/run_ablations.sh`
 Datasets are loaded automatically via `data/data_utils.py` — just pass the name to
 `--data`. Additional benchmarks (`gsm8k`, `csqa`, `minerva`, `aime24/25`, `amc23`,
 `hellaswag`, `pro_medicine`, ...) are also supported.
-
----
-
-## <a name="baselines"></a> 🧠 Baselines
-
-All baselines run under the **same total budget** `B = N·M` for a fair comparison.
-
-```bash
-# Random   — uniform-random allocation
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode random --num_agents 4 --seed 42
-
-# Length   — input-length difficulty proxy
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode length --num_agents 4 --seed 42
-
-# Uniform  — self-consistency (every question gets exactly N samples)
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode vote --num_agents 4 --seed 42
-
-# LLM-Judge — binary easy/hard classification drives allocation
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode llm_judge --num_agents 4 --seed 42
-
-# UAB (Ours) — ANLL-guided marginal-greedy allocation
-python src/main.py --model qwen2.5-1.5b --data math500 --data_size 500 \
-  --budget_mode uav_base --num_agents 4 --tau 0.2 --seed 42
-```
 
 ---
 
