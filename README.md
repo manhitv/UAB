@@ -152,7 +152,7 @@ averaged over **seeds `42 44 46`**.
 |----------|---------------|------|
 | `deepscaler`   | 300 | Competition math |
 | `math500`      | 500 | Competition math |
-| `gpqa`         | 300 | Graduate-level science QA |
+| `gpqa`         | 198 | Graduate-level science QA |
 | `formal_logic` | 0 (full) | Deductive reasoning (MMLU Formal Logic) |
 | `hh_rlhf`      | 300 | Preference classification |
 
