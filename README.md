@@ -50,7 +50,7 @@ models (ANLL from log-probs) and black-box APIs (verbalized confidence).
 #### ⏬ Environment Setup
 
 ```bash
-git clone https://github.com/manhitv/UAB.git
+git clone https://github.com/manhitv/UAB.git UAB
 cd UAB
 
 conda create -n uab python=3.11 -y
