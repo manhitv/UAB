@@ -6,7 +6,8 @@
 
 <div align="center">
 
-[![Python](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/)
+[![arXiv](https://img.shields.io/badge/arXiv-2605.26849-b31b1b)](https://arxiv.org/pdf/2605.26849)
+[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
 [![vLLM](https://img.shields.io/badge/Powered_by-vLLM-orange)](https://github.com/vllm-project/vllm)
 
 </div>
@@ -21,28 +22,36 @@
 
 </div>
 
-**UAB** is the reference implementation of **Uncertainty-Aware Budget Allocation**, a
-test-time scaling method that redistributes a *fixed* sampling budget across questions
-according to per-question difficulty — at **zero extra cost**.
+**UAB** redistributes a *fixed* sampling budget across questions by difficulty — at
+**zero extra cost**. Equal-sample baselines waste compute on easy inputs and starve
+hard ones; UAB casts the allocation as a **concave integer program** solved in two
+phases:
 
-Sampling multiple responses improves LLM reasoning accuracy, but spending equal compute
-on every question wastes budget on easy inputs while starving hard ones. UAB casts
-budget allocation as a **concave integer program** and solves it in two phases:
+- **Phase 1 — Probe.** One generation per question; its **average negative
+  log-likelihood (ANLL)** from the output log-probs is the difficulty signal. This
+  sample also counts toward the final majority vote.
+- **Phase 2 — Allocate.** A **marginal-greedy** algorithm distributes the remaining
+  `(N-1)·M` budget, exactly maximizing a concave coverage surrogate — more samples to
+  uncertain questions, fewer to confident ones.
 
-- **Phase 1 — Probe.** Every question receives **one** generation. Its **average
-  negative log-likelihood (ANLL)**, read directly from the output log-probabilities,
-  serves as a difficulty signal. This generation is *not* wasted — it also contributes
-  to the final majority vote.
-- **Phase 2 — Allocate.** The remaining `(N-1)·M` budget is distributed by a
-  **marginal-greedy** algorithm that exactly maximizes a concave coverage surrogate:
-  uncertain questions receive more samples, confident questions receive fewer.
+No auxiliary model, no extra LLM call. Works on open-weight models (ANLL from
+log-probs) and black-box APIs (verbalized confidence).
 
-UAB needs **no auxiliary model and no extra LLM call**, and works on both open-weight
-models (ANLL from log-probs) and black-box APIs (verbalized confidence).
+📜 **Paper:** [*Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning*](https://arxiv.org/pdf/2605.26849).
 
-📜 For method details and full results, see the paper:
-**Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning** (coming soon...).
-
+> If you find this repository helpful for your work, please consider citing as follows:
+>
+> ```LaTeX
+> @misc{nguyen2026uncertaintyawarebudgetallocationadaptive,
+>     title={Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning}, 
+>      author={Manh Nguyen and Sunil Gupta and Hung Le},
+>      year={2026},
+>      eprint={2605.26849},
+>      archivePrefix={arXiv},
+>      primaryClass={cs.CL},
+>      url={https://arxiv.org/abs/2605.26849}, 
+> }
+> ```
 ---
 
 ## <a name="install"></a> 🚀 Installation
