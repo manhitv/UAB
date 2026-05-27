@@ -43,7 +43,7 @@ log-probs) and black-box APIs (verbalized confidence).
 >
 > ```LaTeX
 > @misc{nguyen2026uncertaintyawarebudgetallocationadaptive,
->     title={Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning}, 
+>      title={Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning}, 
 >      author={Manh Nguyen and Sunil Gupta and Hung Le},
 >      year={2026},
 >      eprint={2605.26849},
