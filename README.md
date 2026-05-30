@@ -37,6 +37,10 @@ phases:
 No auxiliary model, no extra LLM call. Works on open-weight models (ANLL from
 log-probs) and black-box APIs (verbalized confidence).
 
+<div align="center">
+<img src="assets/uab_overview.png" alt="UAB overview" width="70%">
+</div>
+
 📜 **Paper:** [*Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning*](https://arxiv.org/pdf/2605.26849).
 
 > If you find this repository helpful for your work, please consider citing as follows:
