@@ -6,7 +6,7 @@ def load_data(args, split='validation'):
     split = 'validation' if split == 'train' else 'test'
     dataset = load_dataset('cais/mmlu', 'formal_logic')[split]
     dataset = pd.DataFrame(dataset)
-    
+
     questions, labels = [], []
     choices = "ABCD"
     template = '{}\n(A) {}\n(B) {}\n(C) {}\n(D) {}\n\n'

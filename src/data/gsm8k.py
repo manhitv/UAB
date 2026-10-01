@@ -20,7 +20,7 @@ def load_data(args, split='validation'):
         dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
     else :
         dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True).head(args.data_size)
-    
+
     questions, labels = [], []
     for question, answer in zip(dataset['question'], dataset['answer']) :
         label = extract_answer(answer)

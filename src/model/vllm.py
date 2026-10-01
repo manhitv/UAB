@@ -25,14 +25,10 @@ class vLLM:
         self.name = model_dir
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
-        # Qwen3.5 hybrid Mamba/GDN arch crashes CUDAGraph capture in vLLM 0.17.0
-        enforce_eager = "qwen3.5" in model_dir.lower() or "qwen3_5" in model_dir.lower()
-
         self.llm = LLM(
             model=model_dir,
             trust_remote_code=True,
             gpu_memory_utilization=getattr(args, "gpu_memory_utilization", 0.8),
             seed=args.seed,
             dtype=dtype,
-            enforce_eager=enforce_eager,
         )
