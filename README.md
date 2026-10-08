@@ -30,7 +30,7 @@
 No auxiliary model, no extra LLM call. The signal uses only the extracted answers.
 
 <div align="center">
-<img src="assets/uab_overview.png" alt="UAB overview" width="70%">
+<img src="assets/uab_overview.png" alt="UAB overview" width="90%">
 </div>
 
 📜 **Paper:** [*Uncertainty-Aware Budget Allocation for Adaptive Test-Time Reasoning*](https://arxiv.org/pdf/2605.26849).
@@ -95,7 +95,7 @@ Defaults reproduce the method as described above; these vary it.
 
 | Flag | Description |
 |--------|-------------|
-| `--tau`              | Sharpness of `p = exp(-H/tau)` (default `1`). At `K=2` the allocation is `tau`-invariant, since `H` is binary |
+| `--tau`              | Sharpness of `p = exp(-H/tau)` (default `1`) |
 | `--phase1_samples K` | Phase-1 samples per question (default `2`) |
 | `--uncertainty_mode` | `vote_entropy` (default) or a log-prob signal: `anll`, `nll`, `token_var`, `min_token_nll` |
 | `--no_phase1_vote`   | Exclude Phase-1 samples from the final vote. Spends `N-K` samples per question rather than `N` |
