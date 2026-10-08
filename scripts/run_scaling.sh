@@ -2,7 +2,7 @@
 set -e
 source "$(dirname "$0")/common.sh"
 
-BUDGETS=(2 4 8 12 16)
+BUDGETS=(4 8 12 16)
 MODES=("vote" "asc" "uav_base")
 
 for model in "${MAIN_MODELS[@]}"; do
